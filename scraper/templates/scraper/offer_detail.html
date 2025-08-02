@@ -1,0 +1,89 @@
+{% extends 'scraper/base.html' %}
+
+{% block title %}{{ offer.hotel_name }} - Szczegóły oferty{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h2 class="card-title">{{ offer.hotel_name }}</h2>
+        <h6 class="card-subtitle">{{ offer.destination.name }}, {{ offer.destination.country }}</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th>Biuro podróży</th>
+                            <td>{{ offer.agency.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cena</th>
+                            <td><span class="badge bg-success fs-5">{{ offer.price }} zł</span></td>
+                        </tr>
+                        <tr>
+                            <th>Data wylotu</th>
+                            <td>{{ offer.departure_date|date:"d.m.Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Data powrotu</th>
+                            <td>{{ offer.return_date|date:"d.m.Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Długość pobytu</th>
+                            <td>{{ offer.duration }} dni</td>
+                        </tr>
+                        <tr>
+                            <th>Miasto wylotu</th>
+                            <td>{{ offer.departure_city }}</td>
+                        </tr>
+                        <tr>
+                            <th>Wyżywienie</th>
+                            <td>{{ offer.meal_plan }}</td>
+                        </tr>
+                        <tr>
+                            <th>Darmowe WiFi</th>
+                            <td>
+                                {% if offer.has_wifi %}
+                                <span class="text-success">Tak</span>
+                                {% else %}
+                                <span class="text-danger">Nie</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Darmowe leżaki</th>
+                            <td>
+                                {% if offer.has_sunbeds %}
+                                <span class="text-success">Tak</span>
+                                {% else %}
+                                <span class="text-danger">Nie</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Data pobrania</th>
+                            <td>{{ offer.scrape_date|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="card-title">Akcje</h4>
+                    </div>
+                    <div class="card-body">
+                        <a href="{{ offer.offer_url }}" target="_blank" class="btn btn-primary w-100 mb-3">
+                            Przejdź do oferty
+                        </a>
+                        <a href="{% url 'offer_list' %}" class="btn btn-outline-secondary w-100">
+                            Powrót do listy ofert
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

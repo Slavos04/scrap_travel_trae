@@ -1,0 +1,184 @@
+{% extends 'scraper/base.html' %}
+
+{% block title %}Travel Scraper - Lista ofert{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title">Filtry</h3>
+            </div>
+            <div class="card-body">
+                <form method="get" action="{% url 'offer_list' %}">
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Kraj</label>
+                        <select name="country" id="country" class="form-select">
+                            <option value="">Wszystkie</option>
+                            {% for country in countries %}
+                            <option value="{{ country }}" {% if filters.country == country %}selected{% endif %}>{{ country }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="agency" class="form-label">Biuro podróży</label>
+                        <select name="agency" id="agency" class="form-select">
+                            <option value="">Wszystkie</option>
+                            {% for agency in agencies %}
+                            <option value="{{ agency.name }}" {% if filters.agency == agency.name %}selected{% endif %}>{{ agency.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="min_price" class="form-label">Cena od</label>
+                        <input type="number" name="min_price" id="min_price" class="form-control" value="{{ filters.min_price }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="max_price" class="form-label">Cena do</label>
+                        <input type="number" name="max_price" id="max_price" class="form-control" value="{{ filters.max_price }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="min_date" class="form-label">Data wylotu od</label>
+                        <input type="date" name="min_date" id="min_date" class="form-control" value="{{ filters.min_date }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Długość pobytu (dni)</label>
+                        <input type="number" name="duration" id="duration" class="form-control" value="{{ filters.duration }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="meal_plan" class="form-label">Wyżywienie</label>
+                        <input type="text" name="meal_plan" id="meal_plan" class="form-control" value="{{ filters.meal_plan }}">
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="wifi" id="wifi" class="form-check-input" {% if filters.wifi %}checked{% endif %}>
+                        <label for="wifi" class="form-check-label">Darmowe WiFi</label>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="sunbeds" id="sunbeds" class="form-check-input" {% if filters.sunbeds %}checked{% endif %}>
+                        <label for="sunbeds" class="form-check-label">Darmowe leżaki</label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sort" class="form-label">Sortowanie</label>
+                        <select name="sort" id="sort" class="form-select">
+                            <option value="-scrape_date" {% if filters.sort == '-scrape_date' %}selected{% endif %}>Najnowsze</option>
+                            <option value="price" {% if filters.sort == 'price' %}selected{% endif %}>Cena (rosnąco)</option>
+                            <option value="-price" {% if filters.sort == '-price' %}selected{% endif %}>Cena (malejąco)</option>
+                            <option value="departure_date" {% if filters.sort == 'departure_date' %}selected{% endif %}>Data wylotu (rosnąco)</option>
+                            <option value="-departure_date" {% if filters.sort == '-departure_date' %}selected{% endif %}>Data wylotu (malejąco)</option>
+                            <option value="duration" {% if filters.sort == 'duration' %}selected{% endif %}>Długość pobytu (rosnąco)</option>
+                            <option value="-duration" {% if filters.sort == '-duration' %}selected{% endif %}>Długość pobytu (malejąco)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Filtruj</button>
+                    <a href="{% url 'offer_list' %}" class="btn btn-outline-secondary w-100 mt-2">Wyczyść filtry</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <h2 class="mb-4">Lista ofert</h2>
+        
+        {% if offers %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for offer in offers %}
+            <div class="col">
+                <div class="card offer-card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">{{ offer.hotel_name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">{{ offer.destination.name }}, {{ offer.destination.country }}</h6>
+                        <p class="card-text">
+                            <strong>Biuro:</strong> {{ offer.agency.name }}<br>
+                            <strong>Termin:</strong> {{ offer.departure_date|date:"d.m.Y" }} - {{ offer.return_date|date:"d.m.Y" }}<br>
+                            <strong>Długość:</strong> {{ offer.duration }} dni<br>
+                            <strong>Wylot z:</strong> {{ offer.departure_city }}<br>
+                            <strong>Wyżywienie:</strong> {{ offer.meal_plan }}<br>
+                        </p>
+                        <div class="mt-2">
+                            {% if offer.has_wifi %}
+                            <span class="badge bg-info text-dark me-1">WiFi</span>
+                            {% endif %}
+                            {% if offer.has_sunbeds %}
+                            <span class="badge bg-info text-dark">Leżaki</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="price-badge text-success">{{ offer.price }} zł</span>
+                        <div>
+                            <a href="{{ offer.offer_url }}" target="_blank" class="btn btn-sm btn-outline-primary">Strona oferty</a>
+                            <a href="{% url 'offer_detail' offer.id %}" class="btn btn-sm btn-primary">Szczegóły</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% for key, value in filters.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">&laquo; Pierwsza</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in filters.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Poprzednia</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">&laquo; Pierwsza</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Poprzednia</a>
+                </li>
+                {% endif %}
+                
+                {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                <li class="page-item active">
+                    <a class="page-link" href="#">{{ i }}</a>
+                </li>
+                {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ i }}{% for key, value in filters.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in filters.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Następna</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in filters.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Ostatnia &raquo;</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Następna</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Ostatnia &raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% else %}
+        <div class="alert alert-info">
+            <p>Brak ofert spełniających podane kryteria.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

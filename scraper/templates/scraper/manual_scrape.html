@@ -1,0 +1,108 @@
+{% extends 'scraper/base.html' %}
+
+{% block title %}Travel Scraper - Ręczne scrapowanie{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title">Ręczne scrapowanie ofert</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">Wypełnij formularz, aby ręcznie uruchomić scrapowanie ofert turystycznych.</p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_countries" class="form-label">{{ form.countries.label }}</label>
+                        <div class="form-check">
+                            {{ form.countries }}
+                        </div>
+                        {% if form.countries.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.countries.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_departure_city" class="form-label">{{ form.departure_city.label }}</label>
+                        <input type="text" name="departure_city" id="id_departure_city" class="form-control {% if form.departure_city.errors %}is-invalid{% endif %}" value="{{ form.departure_city.value|default:form.departure_city.initial }}">
+                        {% if form.departure_city.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.departure_city.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_min_date" class="form-label">{{ form.min_date.label }}</label>
+                        <input type="date" name="min_date" id="id_min_date" class="form-control {% if form.min_date.errors %}is-invalid{% endif %}" value="{{ form.min_date.value|default:form.min_date.initial }}">
+                        {% if form.min_date.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.min_date.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_min_duration" class="form-label">{{ form.min_duration.label }}</label>
+                                <input type="number" name="min_duration" id="id_min_duration" class="form-control {% if form.min_duration.errors %}is-invalid{% endif %}" value="{{ form.min_duration.value|default:form.min_duration.initial }}" min="1" max="30">
+                                {% if form.min_duration.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.min_duration.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_max_duration" class="form-label">{{ form.max_duration.label }}</label>
+                                <input type="number" name="max_duration" id="id_max_duration" class="form-control {% if form.max_duration.errors %}is-invalid{% endif %}" value="{{ form.max_duration.value|default:form.max_duration.initial }}" min="1" max="30">
+                                {% if form.max_duration.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.max_duration.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_meal_plan" class="form-label">{{ form.meal_plan.label }}</label>
+                        <input type="text" name="meal_plan" id="id_meal_plan" class="form-control {% if form.meal_plan.errors %}is-invalid{% endif %}" value="{{ form.meal_plan.value|default:form.meal_plan.initial }}">
+                        {% if form.meal_plan.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.meal_plan.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="wifi" id="id_wifi" class="form-check-input" {% if form.wifi.value %}checked{% endif %}>
+                        <label for="id_wifi" class="form-check-label">{{ form.wifi.label }}</label>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="sunbeds" id="id_sunbeds" class="form-check-input" {% if form.sunbeds.value %}checked{% endif %}>
+                        <label for="id_sunbeds" class="form-check-label">{{ form.sunbeds.label }}</label>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <p><strong>Uwaga!</strong> Scrapowanie może potrwać kilka minut. Proszę cierpliwie czekać na zakończenie procesu.</p>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Uruchom scrapowanie</button>
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary">Anuluj</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

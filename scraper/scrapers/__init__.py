@@ -1,0 +1,1 @@
+# Pakiet zawierający scrapery dla różnych stron z ofertami turystycznymi

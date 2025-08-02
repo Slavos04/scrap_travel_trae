@@ -1,0 +1,121 @@
+{% extends 'scraper/base.html' %}
+
+{% block title %}Travel Scraper - Strona główna{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title">Travel Scraper</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">Aplikacja do monitorowania cen ofert turystycznych do Bułgarii, Egiptu i Turcji.</p>
+                <p>Codziennie sprawdzamy ceny na stronach:</p>
+                <ul>
+                    <li>travelplanet.pl</li>
+                    <li>wakacje.pl</li>
+                    <li>fly.pl</li>
+                </ul>
+                <p>Parametry wyszukiwania:</p>
+                <ul>
+                    <li>Wylot z Katowic</li>
+                    <li>Data wylotu od 15.05.2026</li>
+                    <li>Czas pobytu: 5-8 dni</li>
+                    <li>Wyżywienie: All Inclusive</li>
+                    <li>Darmowe WiFi i leżaki</li>
+                </ul>
+                
+                <form action="{% url 'run_scraper' %}" method="post" class="mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Uruchom scrapowanie teraz</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h3 class="card-title">Statystyki</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Liczba ofert
+                        <span class="badge bg-primary rounded-pill">{{ total_offers }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Liczba destynacji
+                        <span class="badge bg-primary rounded-pill">{{ destinations_count }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Liczba biur podróży
+                        <span class="badge bg-primary rounded-pill">{{ agencies_count }}</span>
+                    </li>
+                </ul>
+                
+                {% if last_scrape_date %}
+                <div class="mt-3">
+                    <p class="text-muted">Ostatnie scrapowanie: {{ last_scrape_date|date:"d.m.Y H:i" }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3 class="card-title">Najnowsze oferty</h3>
+            </div>
+            <div class="card-body">
+                {% if latest_offers %}
+                <div class="list-group">
+                    {% for offer in latest_offers %}
+                    <a href="{% url 'offer_detail' offer.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ offer.hotel_name }}</h5>
+                            <span class="badge bg-success">{{ offer.price }} zł</span>
+                        </div>
+                        <p class="mb-1">{{ offer.destination.name }}, {{ offer.destination.country }}</p>
+                        <small>{{ offer.departure_date|date:"d.m.Y" }} - {{ offer.return_date|date:"d.m.Y" }} ({{ offer.duration }} dni)</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>Brak ofert. Uruchom scrapowanie, aby pobrać oferty.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h3 class="card-title">Najtańsze oferty</h3>
+            </div>
+            <div class="card-body">
+                {% if cheapest_offers %}
+                <div class="list-group">
+                    {% for offer in cheapest_offers %}
+                    <a href="{% url 'offer_detail' offer.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ offer.hotel_name }}</h5>
+                            <span class="badge bg-success">{{ offer.price }} zł</span>
+                        </div>
+                        <p class="mb-1">{{ offer.destination.name }}, {{ offer.destination.country }}</p>
+                        <small>{{ offer.departure_date|date:"d.m.Y" }} - {{ offer.return_date|date:"d.m.Y" }} ({{ offer.duration }} dni)</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>Brak ofert. Uruchom scrapowanie, aby pobrać oferty.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

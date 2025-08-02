@@ -1,0 +1,35 @@
+{% extends 'scraper/base.html' %}
+
+{% block title %}Strona nie znaleziona (404){% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">Strona nie znaleziona (404)</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Przepraszamy, ale strona, której szukasz, nie istnieje.</p>
+                    <p>Sprawdź, czy adres URL jest poprawny lub wróć do strony głównej.</p>
+                    
+                    <div class="mt-4">
+                        <h5>Możliwe przyczyny błędu:</h5>
+                        <ul>
+                            <li>Nieprawidłowy adres URL</li>
+                            <li>Strona została usunięta lub przeniesiona</li>
+                            <li>Oferta, której szukasz, nie jest już dostępna</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'home' %}" class="btn btn-primary">Wróć do strony głównej</a>
+                        <a href="{% url 'offer_list' %}" class="btn btn-outline-primary ml-2">Przeglądaj oferty</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
